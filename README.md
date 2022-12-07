@@ -4,7 +4,7 @@ to run backend: npm run devstart
 
 to run frontend(hydronetwork file): npm run serve
 
-Data folder contains data for neo4j and postgis
+Ask me for access to the Data folder that contains data for neo4j and postgis
 
 Neo4j DB
 
