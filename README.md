@@ -34,16 +34,14 @@ Postgres
     run:
     CREATE EXTENSION postgis;
 
-    CREATE INDEX IF NOT EXISTS nhd_flow_catchment_id_idx
-        ON public.nhd_flow_catchment USING btree
-        (nhdplusid ASC NULLS LAST)
-        TABLESPACE pg_default;
-
     How to add data to postgis, data can be found in data folder
     Using OSGeo4W Shell (installed with QGIS)
      Open OSGeo4W Shell
     cd to directory with gpkg file
     ogr2ogr -f PostgreSQL "PG:user=youruser password=yourpassword dbname=yourdbname" yourgeopackage.gpkg
 
-
+    CREATE INDEX IF NOT EXISTS nhd_flow_catchment_id_idx
+        ON public.nhd_flow_catchment USING btree
+        (nhdplusid ASC NULLS LAST)
+        TABLESPACE pg_default;
 
