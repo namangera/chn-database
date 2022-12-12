@@ -1,8 +1,13 @@
 CHN DATABASE
+Node: 18.12.1
+Neo4j: 5.2
+Postgres: 15
+JDK: 17
+QGIS: 3.28.1
 
 to run backend: npm run devstart
 
-to run frontend(hydronetwork file): npm run serve
+to run frontend(https://github.com/Sacha-rncan/hydronetwork): npm run serve
 
 Ask me for access to the Data folder that contains data for neo4j and postgis
 
