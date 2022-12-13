@@ -47,8 +47,11 @@ router.get('/neo2/:long/:lat/:projection', async(req,res,next)=>{
     const result = await session.readTransaction(tx =>
       tx.run(
         // upstream query
-        `MATCH(s:Segment) WHERE s.NodeID = $nodeid 
-        OPTIONAL MATCH (s)-[d:upstream*]->(n) RETURN DISTINCT n.NodeID as NodeID`
+        // `MATCH(s:Segment) WHERE s.NodeID = $nodeid 
+        // OPTIONAL MATCH (s)-[d:upstream*]->(n) RETURN DISTINCT n.NodeID as NodeID`
+        `MATCH (s {NodeID: $nodeid})-[u:upstream*]->(b)
+        WITH s, collect(b) AS v UNWIND v+s AS a
+        RETURN a.NodeID`
         
         ,
         { nodeid: ''+geo } 
@@ -123,9 +126,11 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
       const result = await session.readTransaction(tx =>
         tx.run(
           // Downstream query
-          `MATCH(s:Segment) WHERE s.NodeID = $nodeid 
-          OPTIONAL MATCH (s)-[d:downstream*]->(n) RETURN DISTINCT n.NodeID as NodeID`
-          
+          // `MATCH(s:Segment) WHERE s.NodeID = $nodeid 
+          // OPTIONAL MATCH (s)-[d:downstream*]->(n) RETURN DISTINCT n.NodeID as NodeID`
+          `MATCH (s {NodeID: $nodeid})-[d:downstream*]->(b)
+          WITH s, collect(b) AS v UNWIND v+s AS a
+          RETURN a.NodeID`
           ,
           { nodeid: ''+geo } 
         )
@@ -245,6 +250,43 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
     }finally {
     }
   })
+
+  router.get('/NeoTest', async(req,res,next)=>{
+    const neo4j = require('neo4j-driver')
+    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+    const session = driver.session();
+    var startTime = performance.now()
+    try{
+      await db.query('BEGIN')
+      await driver.verifyConnectivity()
+      console.log('\nNEO4j Query starting. \nDriver created')
+      const result = await session.readTransaction(tx =>
+        tx.run(
+          `MATCH(s:Segment) WHERE s.NodeID = '60000200097498' 
+          OPTIONAL MATCH (s)-[d:upstream*]->(n) RETURN DISTINCT n.NodeID as NodeID`
+        )
+      ) 
+      var arr = []
+      const d_area = result.records.map(row =>{
+        arr.push(row.get(0))
+      })
+      console.log('\nNumber of catchment: '+arr.length);
+      var ids = arr.toString();
+      console.log('Drainage area found')
+      
+      await session.close()
+      console.log('Session Closed')
+      await driver.close()
+      console.log('Driver Closed')
+  var endTime = performance.now()
+    }
+    catch (e) {
+      await db.query('ROLLBACK')
+      throw e
+    }finally {
+    }
+    }
+  )
 
   // Faster pg 
   router.get('/neo3/:long/:lat/:projection', async(req,res,next)=>{
