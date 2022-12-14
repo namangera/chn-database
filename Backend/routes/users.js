@@ -51,7 +51,7 @@ router.get('/neo2/:long/:lat/:projection', async(req,res,next)=>{
         // OPTIONAL MATCH (s)-[d:upstream*]->(n) RETURN DISTINCT n.NodeID as NodeID`
         `MATCH (s {NodeID: $nodeid})-[u:upstream*]->(b)
         WITH s, collect(b) AS v UNWIND v+s AS a
-        RETURN a.NodeID`
+        RETURN DISTINCT a.NodeID`
         
         ,
         { nodeid: ''+geo } 
@@ -130,7 +130,7 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
           // OPTIONAL MATCH (s)-[d:downstream*]->(n) RETURN DISTINCT n.NodeID as NodeID`
           `MATCH (s {NodeID: $nodeid})-[d:downstream*]->(b)
           WITH s, collect(b) AS v UNWIND v+s AS a
-          RETURN a.NodeID`
+          RETURN DISTINCT a.NodeID`
           ,
           { nodeid: ''+geo } 
         )
