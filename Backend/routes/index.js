@@ -1,5 +1,10 @@
+if(process.env.NODE_ENV !== 'production')
+{
+  require('dotenv').config();
+}
 var express = require('express');
 var router = express.Router();
+
 var db = require('../queries');
 const users = require('./users')
 

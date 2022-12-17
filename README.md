@@ -50,3 +50,17 @@ Postgres
         (nhdplusid ASC NULLS LAST)
         TABLESPACE pg_default;
 
+
+Setting up your environment variables
+
+    Create a file in the same directory as the package.json called ".env"
+
+    add the following:
+        DB_USER = <your db user>
+        DB_PASS = <your db password>
+        DB_HOST = <your db host url>
+        DB_NAME = <your db name>
+        DB_PORT = <your db port>
+        NEO4J_HOST = <your neo4j url e.g. neo4j://localhost:7687>
+        NEO4J_USER = <your neo4j user>
+        NEO4J_PASS = <your neo4j passwordnpm >

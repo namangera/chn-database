@@ -16,9 +16,8 @@ router.get('/neo2/:long/:lat/:projection', async(req,res,next)=>{
   // to set projection be read from geoview value use var projection = req.params.projection;
   var projection = '4269';
   // neo4j server connection
-  // TODO use env variables 
   const neo4j = require('neo4j-driver')
-  const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+  const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
   const session = driver.session();
   // testing cordinates 
   // (-71.89046076469687,45.405030523198704) is: 60000200097498  6.5 k
@@ -101,9 +100,8 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
     // to set projection be read from geoview value use var projection = req.params.projection;
     var projection = '4269';
     // neo4j server connection
-    // TODO use env variables 
     const neo4j = require('neo4j-driver')
-    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+    const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
     const session = driver.session();
     // pg routing function to get NHDID for given cordinate
       var cords = [long, lat]
@@ -179,9 +177,8 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
     // to set projection be read from geoview value use var projection = req.params.projection;
     var projection = '4269';
     // neo4j server connection
-    // TODO use env variables 
     const neo4j = require('neo4j-driver')
-    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+    const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
     const session = driver.session();
     // pg routing function to get NHDID for given cordinate
       var cords = [long, lat]
@@ -253,7 +250,7 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
 
   router.get('/NeoTest', async(req,res,next)=>{
     const neo4j = require('neo4j-driver')
-    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+    const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
     const session = driver.session();
     var startTime = performance.now()
     try{
@@ -297,9 +294,8 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
     // to set projection be read from geoview value use var projection = req.params.projection;
     var projection = '4269';
     // neo4j server connection
-    // TODO use env variables 
     const neo4j = require('neo4j-driver')
-    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+    const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
     const session = driver.session();
     // testing cordinates 
     // (-71.89046076469687,45.405030523198704) is: 60000200097498  6.5 k
@@ -405,7 +401,7 @@ router.get('/neo', async(req,res)=>{
 
   //neo4j query
 const neo4j = require('neo4j-driver')
-const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
 const session = driver.session();
   const upstream = 'MATCH(s:Segment) WHERE s.NodeID = $nodeid OPTIONAL MATCH (s)-[d:upstream*]->(n) WITH s+COLLECT(DISTINCT n) AS v UNWIND v as a RETURN DISTINCT a.NodeID as NodeID';
   const params = { nodeid: geo };
