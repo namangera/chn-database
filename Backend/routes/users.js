@@ -101,7 +101,7 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
     var projection = '4269';
     // neo4j server connection
     const neo4j = require('neo4j-driver')
-    const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
+    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
     const session = driver.session();
     // pg routing function to get NHDID for given cordinate
       var cords = [long, lat]
@@ -150,12 +150,23 @@ WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (
   console.log(`Call to flowpath plus neo4j request took ${endTime - startTime} milliseconds`)
   
   var startTime2 = performance.now()
-      const q2=  `SELECT row_to_json(fc)
-    FROM ( SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features
-    FROM (SELECT 'Feature' As type, ST_AsGeoJSON(ST_Union(ARRAY(SELECT flow.geom FROM nhdflowlinejoined as flow 
-  WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (select 'name') t)As properties) As f )  As fc;`
-      const{rows} = await db.query(q2)
-      res.json(rows)
+  //     const q2=  `SELECT row_to_json(fc)
+  //   FROM ( SELECT 'FeatureCollection' As type, array_to_json(array_agg(f)) As features
+  //   FROM (SELECT 'Feature' As type, ST_AsGeoJSON(ST_Union(ARRAY(SELECT flow.geom FROM nhdflowlinejoined as flow 
+  // WHERE nhdplusid in (`+ids+`))))::json As geometry, (select row_to_json(t) from (select 'name') t)As properties) As f )  As fc;`
+  //     const{rows} = await db.query(q2)
+  //     res.json(rows)
+  const geom_return= 
+     `SELECT json_build_object(
+        'type', 'FeatureCollection',
+        'features', json_agg(ST_AsGeoJSON(t.*)::json)
+        )
+    FROM (SELECT ST_UNION(ARRAY(SELECT DISTINCT flow.geom FROM nhdflowlinejoined as flow
+	WHERE nhdplusid in (`+ids+`))))
+          as t(geom);`
+      const{rows} = await db.query(geom_return)
+      var poly = rows[0].json_build_object
+      res.json(poly)
       console.log('\nJson returned');
       
     var endTime2 = performance.now()

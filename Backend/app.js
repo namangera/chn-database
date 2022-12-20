@@ -7,6 +7,7 @@ const mountRoutes = require('./routes')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var drainageRouter = require('./routes/drainage')
+var downstreamRouter = require('./routes/downstream')
 var db = require('./queries');
 var app = express();
 mountRoutes(app)
@@ -24,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/drainage', drainageRouter);
+app.use('/downstream', downstreamRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
