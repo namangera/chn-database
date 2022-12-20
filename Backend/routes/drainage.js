@@ -5,8 +5,6 @@ const turf = require('@turf/turf')
 fs = require('fs');
 module.exports = router;
 
-
-
 // http://localhost:3000/drainage/area/-71.99755088522/45.22905067826488/4269
 router.get('/area/:long/:lat/:projection', async(req,res,next)=>{
     res.setHeader("Access-Control-Allow-Origin", '*');
@@ -15,7 +13,7 @@ router.get('/area/:long/:lat/:projection', async(req,res,next)=>{
     var projection = '4269';
 
     const neo4j = require('neo4j-driver')
-    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+    const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
     const session = driver.session();
   
     // pg routing function to get NHDID for given cordinate

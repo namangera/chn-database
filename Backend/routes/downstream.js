@@ -14,7 +14,7 @@ router.get('/segment/:long/:lat/:projection', async(req,res,next)=>{
     var projection = '4269';
 
     const neo4j = require('neo4j-driver')
-    const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4j", "sherbrooke"));
+    const driver = new neo4j.driver(process.env.NEO4J_HOST, neo4j.auth.basic(process.env.NEO4J_USER, process.env.NEO4J_PASS));
     const session = driver.session();
   
     // pg routing function to get NHDID for given cordinate
