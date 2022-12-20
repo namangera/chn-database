@@ -6,6 +6,8 @@ fs = require('fs');
 module.exports = router;
 
 // http://localhost:3000/drainage/area/-71.99755088522/45.22905067826488/4269
+// http://localhost:3000/drainage/area/-71.88980819483163/45.40592175723562/4269 23 k 
+
 router.get('/area/:long/:lat/:projection', async(req,res,next)=>{
     res.setHeader("Access-Control-Allow-Origin", '*');
     var long = req.params.long;
@@ -70,6 +72,16 @@ router.get('/area/:long/:lat/:projection', async(req,res,next)=>{
     FROM (SELECT ST_UNION(ARRAY(SELECT DISTINCT catch.geom FROM nhd_flow_catchment as catch
 	WHERE nhdplusid in (`+ids+`))))
           as t(geom);`
+// https://gis.stackexchange.com/questions/324736/extracting-single-boundary-from-multipolygon-in-postgis
+        const boundary_return = 
+        `SELECT ST_ExteriorRing((ST_Dump(ST_Union(geom))).geom) as geom
+        FROM (SELECT DISTINCT catch.geom FROM nhd_flow_catchment as catch
+      WHERE nhdplusid in (`+ids+`))
+              as t(geom);`
+        const boundary_return2 = 
+        `SELECT ST_ExteriorRing((ST_Dump(geom)).geom) as geom FROM (SELECT DISTINCT catch.geom FROM nhd_flow_catchment as catch
+          WHERE nhdplusid in (`+ids+`))
+                  as t(geom);`
 //      `SELECT json_build_object(
 //         'type', 'FeatureCollection',
 //         'features', json_agg(ST_AsGeoJSON(t.*)::json)
@@ -86,9 +98,11 @@ router.get('/area/:long/:lat/:projection', async(req,res,next)=>{
 // FROM(SELECT DISTINCT catch.geom FROM nhd_flow_catchment as catch
 // 	WHERE nhdplusid in (`+ids+`)) as geom)
 //           as t(geom);`
-      const{rows} = await db.query(geom_return)
-      var poly = rows[0].json_build_object
-      res.json(poly)
+      // const{rows} = await db.query(geom_return)
+      const{rows} = await db.query(boundary_return2)
+      // var poly = rows[0].json_build_object
+      // res.json(poly)
+          res.json(rows)
       // var dissolved = turf.dissolve(poly)
       // res.json(dissolved)
       console.log('\nJson returned');
