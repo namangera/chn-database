@@ -65,25 +65,47 @@ router.get('/segment/:long/:lat/:projection', async(req,res,next)=>{
 
   var startTime2 = performance.now()
       const geom_return= 
-     `SELECT json_build_object(
+      `SELECT
+      json_build_object(
+            'type', 'FeatureCollection',
+            'features', json_agg(ST_AsGeoJSON(t.*)::json)
+      )
+    FROM
+    (
+      --SELECT ST_LINEMERGE(
+        --ST_UNION(
+          --ARRAY(
+            SELECT DISTINCT ST_LINEMERGE(flow.geom) FROM nhdflowlinejoined as flow
+            WHERE nhdplusid in
+            (
+              `+ids+`
+            )
+          --)
+        --)
+      --)
+    )   
+	as t(geom)
+    ;`
+     /* `SELECT json_build_object(
         'type', 'FeatureCollection',
         'features', json_agg(ST_AsGeoJSON(t.*)::json)
         )
-    FROM (SELECT ST_UNION(ARRAY(SELECT DISTINCT flow.geom FROM nhdflowlinejoined as flow
+    FROM (SELECT ST_LineMerge(ARRAY(SELECT DISTINCT flow.geom FROM nhdflowlinejoined as flow
 	WHERE nhdplusid in (`+ids+`))))
-          as t(geom);`
-      const{rows} = await db.query(geom_return)
-      var poly = rows[0].json_build_object
-      res.json(poly)
+          as t(geom);` */
+      console.log(geom_return);
+      const{rows} = await db.query(geom_return);
+      var poly = rows[0].json_build_object;
+      res.json(poly);
     //   var dissolved = turf.dissolve(poly)
     //   res.json(dissolved)
       console.log('\nJson returned');
       
-    var endTime2 = performance.now()
-    console.log(`Call to run build took ${endTime2 - startTime2} milliseconds`)
+    var endTime2 = performance.now();
+    console.log(`Call to run build took ${endTime2 - startTime2} milliseconds`);
     }
     catch (e) {
-      await db.query('ROLLBACK')
+      await db.query('ROLLBACK');
       throw e
     }finally {
     }
