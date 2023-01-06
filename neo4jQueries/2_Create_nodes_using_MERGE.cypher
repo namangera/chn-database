@@ -3,4 +3,4 @@
 MERGE (s:Segment {NodeID: line.NHDPlusID})
 ON CREATE SET
     s.downStream = line.NHDPlusFlowlineVAA_ToNode,
-    s.upStream = line.NHDPlusFlowlineVAA_FromNode
+    s.upStream = line.NHDPlusFlowlineVAA_FromNode;

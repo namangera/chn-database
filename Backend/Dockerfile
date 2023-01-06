@@ -10,6 +10,6 @@ COPY . .
 
 RUN npm i -g nodemon
 
-EXPOSE 8080
+EXPOSE 8003
 
 CMD ["npm", "run", "devstart"]
